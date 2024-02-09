@@ -33,5 +33,6 @@ CloudFront service principal will sign each request with SigV4. The signature wi
 
 
 
+    minimum_protocol_version = "TLSv1.2_2021"
 
 

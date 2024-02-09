@@ -73,7 +73,7 @@ resource "aws_s3_bucket_public_access_block" "web_portal" {
 
 resource "aws_s3_bucket_acl" "web_portal_acl" {
   bucket     = aws_s3_bucket.web_portal.id
-  acl        = "public-read"
+  acl        = "private"
   depends_on = [aws_s3_bucket_ownership_controls.web_portal_acl_ownership]
 }
 
@@ -102,7 +102,6 @@ resource "aws_s3_object" "index_html" {
   bucket       = local.bucket_name
   key          = "index.html"
   source       = "./website/index.html"
-  content_type = "text/html"
 }
 
 resource "aws_s3_object" "error_html" {
@@ -112,6 +111,5 @@ resource "aws_s3_object" "error_html" {
   bucket       = local.bucket_name
   key          = "error.html"
   source       = "./website/error.html"
-  content_type = "text/html"
 }
 
