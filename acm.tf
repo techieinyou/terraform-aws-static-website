@@ -4,7 +4,7 @@ resource "aws_acm_certificate" "ssl" {
   validation_method         = "DNS"
   subject_alternative_names = (var.need_www_redirect) ? ["www.${var.domain_name}"] : []
 
-  tags = local.common_tags
+  tags = var.tags
 
   lifecycle {
     create_before_destroy = true

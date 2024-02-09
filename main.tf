@@ -2,8 +2,5 @@ locals {
   bucket_name = var.domain_name
 }
 
-locals {
-  common_tags = {
-    created_by     = "TechieInYou"
-  }
-}
+data "aws_caller_identity" "current" {}
+
