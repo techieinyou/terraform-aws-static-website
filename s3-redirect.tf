@@ -53,7 +53,7 @@ resource "aws_s3_bucket_public_access_block" "web_portal_redirect" {
 resource "aws_s3_bucket_acl" "web_portal_redirect_acl" {
   count      = (var.need_www_redirect) ? 1 : 0
   bucket     = aws_s3_bucket.web_portal_redirect[0].id
-  acl        = "private"
+  acl        = "public-read"
   depends_on = [aws_s3_bucket_ownership_controls.web_portal_redirect_acl_ownership]
 }
 

@@ -73,7 +73,7 @@ resource "aws_s3_bucket_public_access_block" "web_portal" {
 
 resource "aws_s3_bucket_acl" "web_portal_acl" {
   bucket     = aws_s3_bucket.web_portal.id
-  acl        = "private"
+  acl        = "public-read"
   depends_on = [aws_s3_bucket_ownership_controls.web_portal_acl_ownership]
 }
 
