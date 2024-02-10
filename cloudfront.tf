@@ -7,16 +7,27 @@ resource "aws_cloudfront_origin_access_control" "oac" {
   signing_protocol                  = "sigv4"
 }
 
+# cloudfront OAI for accessing s3 content
+resource "aws_cloudfront_origin_access_identity" "oai" {
+  comment = "OAI to access ${local.bucket_name}"
+}
+
 # Cloudfront for primary(root) S3
 resource "aws_cloudfront_distribution" "s3_root" {
 
   origin {
-    # domain_name = aws_s3_bucket_website_configuration.web_portal_webConfig.website_endpoint
-    domain_name = aws_s3_bucket.web_portal.bucket_domain_name
-    origin_id   = "S3-${local.bucket_name}"
-    origin_access_control_id = aws_cloudfront_origin_access_control.oac.id
-    # s3_origin_config {
-    #   origin_access_identity = aws_cloudfront_origin_access_identity.user.cloudfront_access_identity_path
+    domain_name = (local.bucket_access_method == "public") ? aws_s3_bucket_website_configuration.web_portal_webConfig.website_endpoint : aws_s3_bucket.web_portal.bucket_domain_name
+    origin_id                = "S3-${local.bucket_name}"
+    origin_access_control_id = (local.bucket_access_method == "oac") ? aws_cloudfront_origin_access_control.oac.id : null
+    s3_origin_config {
+      origin_access_identity = (local.bucket_access_method == "oai") ? aws_cloudfront_origin_access_identity.oai.cloudfront_access_identity_path:null
+    }
+
+    # custom_origin_config {
+    #   http_port              = 80
+    #   https_port             = 443
+    #   origin_protocol_policy = "http-only"
+    #   origin_ssl_protocols   = ["TLSv1", "TLSv1.1", "TLSv1.2"]
     # }
   }
 

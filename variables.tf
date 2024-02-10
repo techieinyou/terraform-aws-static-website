@@ -23,6 +23,16 @@ variable "need_www_redirect" {
   description = "Whether redirect from wwww required or not. If yes, this module will create 2 sites with domain_name.com and www.domain_name.com"
 }
 
+variable "s3_access_method" {
+  type = string
+  default = "public"
+  description = "Access method for S3: OAC/OAI/public"
+  validation {
+    condition     = contains(["oac", "oai", "public"], lower(var.s3_access_method))
+    error_message = "Unsupported method <${var.s3_access_method}>. Supported values are <OAC, OAI, public>"
+  }  
+}
+
 variable "need_placeholder_website" {
   type        = bool
   default     = true
