@@ -5,34 +5,6 @@ resource "aws_s3_bucket" "web_portal_redirect" {
   tags   = var.tags
 }
 
-data "aws_iam_policy_document" "wwww_public_access" {
-  count = (var.need_www_redirect) ? 1 : 0
-
-  statement {
-    principals {
-      type        = "Service"
-      identifiers = ["cloudfront.amazonaws.com"]
-    }
-
-    effect = "Allow"
-
-    actions = [
-      "s3:GetObject"
-    ]
-
-    resources = [
-      aws_s3_bucket.web_portal_redirect[0].arn,
-      "${aws_s3_bucket.web_portal_redirect[0].arn}/*",
-    ]
-
-    condition {
-      test     = "StringEquals"
-      variable = "AWS:SourceArn"
-      values   = [format("arn:aws:cloudfront::%s:distribution/%s", data.aws_caller_identity.current.account_id, aws_cloudfront_origin_access_control.oac.id)]
-    }
-  }
-}
-
 resource "aws_s3_bucket_ownership_controls" "web_portal_redirect_acl_ownership" {
   count  = (var.need_www_redirect) ? 1 : 0
   bucket = aws_s3_bucket.web_portal_redirect[0].id
@@ -58,9 +30,9 @@ resource "aws_s3_bucket_acl" "web_portal_redirect_acl" {
 }
 
 resource "aws_s3_bucket_policy" "web_portal_redirect_policy" {
-  count  = (var.need_www_redirect) ? 1 : 0
-  bucket = aws_s3_bucket.web_portal_redirect[0].id
-  policy     = data.aws_iam_policy_document.wwww_public_access[0].json
+  count      = (var.need_www_redirect) ? 1 : 0
+  bucket     = aws_s3_bucket.web_portal_redirect[0].id
+  policy     = (local.origin_access == "oac") ? data.aws_iam_policy_document.www_access_oac[0].json : (local.origin_access == "oai") ? data.aws_iam_policy_document.www_access_oai[0].json : data.aws_iam_policy_document.www_access_public[0].json
   depends_on = [aws_s3_bucket_ownership_controls.web_portal_redirect_acl_ownership]
 }
 

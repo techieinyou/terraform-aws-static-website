@@ -25,16 +25,28 @@ Now you can host your own website to this S3 bucket.
 
 # Security
 
-### Origin Access Control (OAC)
+## SSL Certificate
+
+This module will create a SSL certificate (issued by AWS) which is used by CloudFront for all HTTPS connections.  We use **TLSv1.2_2021** as Minimum version of the SSL protocol. 
+
+## Access Configuration 
+This module offers three options to configure the access to S3 bucket.  You can select your option by assigning OIC, OIA, or Public to the variable **s3_access_method**.  All three methods are explained below. 
+
+### 1. Public Access
+All objects in the S3 bucket will have PUBLIC-READ access
+
+### 2. Origin Access Control (OAC)
 
 This module configure Origin Access Control (OAC) on CloudFrond to access objects from S3.  OAC restrict users to access S3 content through CloudFront only.  
 
-### How OAC works
+**How OAC works**
 
 CloudFront service principal will sign each request with SigV4. The signature will then be included, along with additional data, to form an Authorization header which will be sent to your S3 origin. When your S3 origin receives this request, it will perform the same steps to calculate the signature and compare its calculated signature to the one CloudFront sent with the request. If the signatures match, the request is processed. If the signatures don’t match, the request is denied.
 
-### SSL Certificate
+### 3. Origin Access Identity
 
-This module will create a SSL certificate (issued by AWS) which is used by CloudFront for all HTTPS connections.  We use **TLSv1.2_2021** as Minimum version of the SSL protocol. 
+Thi module will create an Origin Access Identity to restrict access through CloudFront.
+
+
 
 

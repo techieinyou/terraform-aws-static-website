@@ -1,5 +1,7 @@
 
 data "aws_iam_policy_document" "root_access_public" {
+  count = (local.origin_access == "public") ? 1 : 0
+
   statement {
     principals {
       type        = "*"
@@ -20,6 +22,8 @@ data "aws_iam_policy_document" "root_access_public" {
 }
 
 data "aws_iam_policy_document" "root_access_oac" {
+  count = (local.origin_access == "oac") ? 1 : 0
+
   statement {
     principals {
       type        = "Service"
@@ -40,12 +44,14 @@ data "aws_iam_policy_document" "root_access_oac" {
     condition {
       test     = "StringEquals"
       variable = "AWS:SourceArn"
-      values   = [format("arn:aws:cloudfront::%s:distribution/%s", data.aws_caller_identity.current.account_id, aws_cloudfront_origin_access_control.oac.id)]
+      values   = [format("arn:aws:cloudfront::%s:distribution/%s", data.aws_caller_identity.current.account_id, aws_cloudfront_origin_access_control.oac[0].id)]
     }
   }
 }
 
 data "aws_iam_policy_document" "root_access_oai" {
+  count = (local.origin_access == "oai") ? 1 : 0
+
   statement {
     actions = ["s3:GetObject"]
     resources = [
@@ -55,7 +61,75 @@ data "aws_iam_policy_document" "root_access_oai" {
 
     principals {
       type        = "AWS"
-      identifiers = [aws_cloudfront_origin_access_identity.oai.iam_arn]
+      identifiers = [aws_cloudfront_origin_access_identity.oai[0].iam_arn]
+    }
+  }
+}
+
+
+data "aws_iam_policy_document" "www_access_public" {
+  count = (var.need_www_redirect && local.origin_access == "public") ? 1 : 0
+
+  statement {
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject"
+    ]
+
+    resources = [
+      aws_s3_bucket.web_portal_redirect[0].arn,
+      "${aws_s3_bucket.web_portal_redirect[0].arn}/*",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "www_access_oac" {
+  count = (var.need_www_redirect && local.origin_access == "oac") ? 1 : 0
+
+  statement {
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject"
+    ]
+
+    resources = [
+      aws_s3_bucket.web_portal_redirect[0].arn,
+      "${aws_s3_bucket.web_portal_redirect[0].arn}/*",
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceArn"
+      values   = [format("arn:aws:cloudfront::%s:distribution/%s", data.aws_caller_identity.current.account_id, aws_cloudfront_origin_access_control.oac[0].id)]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "www_access_oai" {
+  count = (var.need_www_redirect && local.origin_access == "oai") ? 1 : 0
+
+  statement {
+    actions = ["s3:GetObject"]
+    resources = [
+      aws_s3_bucket.web_portal_redirect[0].arn,
+      "${aws_s3_bucket.web_portal_redirect[0].arn}/*"
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_cloudfront_origin_access_identity.oai[0].iam_arn]
     }
   }
 }

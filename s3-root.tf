@@ -53,7 +53,7 @@ resource "aws_s3_bucket_acl" "web_portal_acl" {
 
 resource "aws_s3_bucket_policy" "web_portal_policy" {
   bucket     = aws_s3_bucket.web_portal.id
-  policy     = (local.bucket_access_method == "oac") ? data.aws_iam_policy_document.root_access_oac.json : (local.bucket_access_method == "oai") ? data.aws_iam_policy_document.root_access_oai.json : data.aws_iam_policy_document.root_access_public.json
+  policy     = (local.origin_access == "oac") ? data.aws_iam_policy_document.root_access_oac[0].json : (local.origin_access == "oai") ? data.aws_iam_policy_document.root_access_oai[0].json : data.aws_iam_policy_document.root_access_public[0].json
   depends_on = [aws_s3_bucket_acl.web_portal_acl]
 }
 
@@ -76,6 +76,7 @@ resource "aws_s3_object" "index_html" {
   bucket     = local.bucket_name
   key        = "index.html"
   source     = "./website/index.html"
+  content_type = "text/html"
 }
 
 resource "aws_s3_object" "error_html" {
@@ -85,5 +86,6 @@ resource "aws_s3_object" "error_html" {
   bucket     = local.bucket_name
   key        = "error.html"
   source     = "./website/error.html"
+  content_type = "text/html"
 }
 

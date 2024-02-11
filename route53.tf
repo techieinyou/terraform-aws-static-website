@@ -8,8 +8,8 @@ resource "aws_route53_record" "root-a" {
   type    = "A"
 
   alias {
-    name                   = aws_cloudfront_distribution.s3_root.domain_name
-    zone_id                = aws_cloudfront_distribution.s3_root.hosted_zone_id
+    name                   = (local.origin_access == "public") ? aws_cloudfront_distribution.public[0].domain_name : (local.origin_access == "oac") ? aws_cloudfront_distribution.oac[0].domain_name : aws_cloudfront_distribution.oai[0].domain_name
+    zone_id                = (local.origin_access == "public") ? aws_cloudfront_distribution.public[0].hosted_zone_id : (local.origin_access == "oac") ? aws_cloudfront_distribution.oac[0].hosted_zone_id : aws_cloudfront_distribution.oai[0].hosted_zone_id
     evaluate_target_health = false
   }
 }
