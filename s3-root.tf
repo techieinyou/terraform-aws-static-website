@@ -69,23 +69,3 @@ resource "aws_s3_bucket_website_configuration" "web_portal_webConfig" {
   }
 }
 
-resource "aws_s3_object" "index_html" {
-  count = (var.need_placeholder_website) ? 1 : 0
-
-  depends_on = [aws_s3_bucket.web_portal]
-  bucket     = local.bucket_name
-  key        = "index.html"
-  source     = "./website/index.html"
-  content_type = "text/html"
-}
-
-resource "aws_s3_object" "error_html" {
-  count = (var.need_placeholder_website) ? 1 : 0
-
-  depends_on = [aws_s3_bucket.web_portal]
-  bucket     = local.bucket_name
-  key        = "error.html"
-  source     = "./website/error.html"
-  content_type = "text/html"
-}
-
