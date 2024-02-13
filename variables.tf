@@ -14,6 +14,7 @@ variable "domain_name" {
 
 variable "hosted_zone_id" {
   type        = string
+  default = null
   description = "Id of the Hosted Zone in Route 53"
 }
 

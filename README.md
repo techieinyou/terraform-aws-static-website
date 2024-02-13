@@ -1,39 +1,56 @@
 # Static Website in AWS
-This Terraform module will create all required AWS resources to host a Static Website on S3 Bucket and distribute using CloudFront CDN.  This module will also host a simple __index.html__ file to show the message **Coming Soon** as a placeholder.
+This [Terraform module](https://registry.terraform.io/modules/techieinyou/static-website/aws/latest)  will create all required AWS resources to host a Static Website on S3 Bucket and distribute using CloudFront CDN.  This module will also host a simple __index.html__ file to show the message **Coming Soon** as a placeholder.
 
 # Pre-requisites
 
 Following are the pre-requisites to start using this module
 
-1. Create a Hosted Zone in Router 53 with your domain name (eg. sample.com) and
-   1. Assign Hosted Zone ID to the variable **hosted_zone_id**.
-   2. Assign your domain name to variable **domain_name**. 
+1. Create a Hosted Zone in Router 53 with your domain name (eg. sample.com) and assign your domain name to variable **domain_name**. 
+   
+2. If the Hosted Zone name is different from the domain name (eg. admin.sample.com), assign Hosted Zone ID to the variable **hosted_zone_id**.  eg. if you created Hosted Zone with the root domain name (sample.com) and trying to create website with a sub-domain (eg. admin.sample.com), then you should provide Hosted Zone Id. if not, this module will retrieve Hosted Zone Id from Route 53 using domain name. 
 
-2. Define 2 AWS providers. 
-   1. One with __region = "us-east-1"__ and alias name **us-east-1**.  This is to provision SSL/TLS certificate in US-East region.
-   2. Default AWS provider with any region you would like to create S3 buckets for website hosting
+3. Define 2 AWS providers. 
+   1. One with __region = "us-east-1"__ an alias name (see below example).  This is to provision SSL/TLS certificate in US-East region.
+   2. Default AWS provider with any region you would like to create S3 buckets for website hosting.  You can define an alias name if you want to specify the purpose (see below example), but alias is optional for default provider.
 
 Below is code sample to declare providers  
 
 ```
+# AWS provider for creating SSL/TLS certificate for your website
+provider "aws" {
+  profile = "profile name configured in %USERPROFILE%\.aws\credentials"
+      or 
+      access_key = "access key of IAM user created in your aws account"
+      secret_key = "access secret of IAM user created in your aws account"
+  region  = "us-east-1" # (AWS will create SSL/TLS certificate in US-East-1 region only)
+  alias = "provder_for_ssl"
+}
+
+# default AWS provider for creating website and other resources
 provider "aws" {
   profile = "profile name configured in %USERPROFILE%\.aws\credentials"  
       or 
       access_key = "access key of IAM user created in your aws account"
       secret_key = "access secret of IAM user created in your aws account"
   region  = "any-aws-region"
-}
-
-provider "aws" {
-  profile = "profile name configured in %USERPROFILE%\.aws\credentials"
-      or 
-      access_key = "access key of IAM user created in your aws account"
-      secret_key = "access secret of IAM user created in your aws account"
-  region  = "us-east-1"
-  alias = "us-east-1"
+  alias = "provder_for_website" # (alias name for default provider is optional)
 }
 ```
 
+Here is sample code to execute the module and assign above declared providers
+
+```
+module "static-website-prod" {
+  source  = "techieinyou/static-website/aws"
+  version = "*.*.*"  # use latest version 
+  domain_name = "your-domain.com"
+  hosted_zone_id = "Id of Hosted Zone you created in Route 53"
+  providers = {
+    aws.us-east-1 = aws.provder_for_ssl
+    aws = aws.provder_for_website     # assign aws if there is no alias provided above
+  }
+}
+```
 
 # What will this module do?
 

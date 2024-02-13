@@ -34,4 +34,4 @@ override.tf.json
 # Ignore all packages created locally
 *.zip
 
-/templates
+/website-template
