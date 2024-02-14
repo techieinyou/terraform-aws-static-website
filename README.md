@@ -86,7 +86,7 @@ CloudFront service principal will sign each request with SigV4. The signature wi
 
 ### 3. Origin Access Identity (OAI)
 
-Thi module will create an Origin Access Identity to restrict access through CloudFront.
+This module will create an Origin Access Identity to restrict access through CloudFront.
 
 
 
