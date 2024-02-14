@@ -32,12 +32,14 @@ resource "aws_s3_bucket_cors_configuration" "web_portal_cors" {
 resource "aws_s3_bucket_ownership_controls" "web_portal_acl_ownership" {
   bucket = aws_s3_bucket.web_portal.id
   rule {
-    object_ownership = "BucketOwnerPreferred"
+    object_ownership = "ObjectWriter"
   }
 }
 
 # to turn off Block public access (bucket settings)
 resource "aws_s3_bucket_public_access_block" "web_portal" {
+  count = (local.origin_access == "public") ? 1 : 0
+
   bucket                  = aws_s3_bucket.web_portal.id
   block_public_acls       = false
   block_public_policy     = false
@@ -46,6 +48,8 @@ resource "aws_s3_bucket_public_access_block" "web_portal" {
 }
 
 resource "aws_s3_bucket_acl" "web_portal_acl" {
+  count = (local.origin_access == "public") ? 1 : 0
+
   bucket     = aws_s3_bucket.web_portal.id
   acl        = "public-read"
   depends_on = [aws_s3_bucket_public_access_block.web_portal, aws_s3_bucket_ownership_controls.web_portal_acl_ownership]
