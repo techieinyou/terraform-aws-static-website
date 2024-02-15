@@ -1,28 +1,10 @@
-# cloudfront OAC for accessing s3 content
-resource "aws_cloudfront_origin_access_control" "oac" {
-  count = (local.origin_access == "oac") ? 1 : 0
-
-  name                              = var.domain_name
-  description                       = "Origin Access Control for ${var.domain_name}"
-  origin_access_control_origin_type = "s3"
-  signing_behavior                  = "always"
-  signing_protocol                  = "sigv4"
-}
-
-# cloudfront OAI for accessing s3 content
-resource "aws_cloudfront_origin_access_identity" "oai" {
-  count = (local.origin_access == "oai") ? 1 : 0
-
-  comment = "OAI to access ${local.bucket_name}"
-}
-
-# Cloudfront for primary(root) S3
-resource "aws_cloudfront_distribution" "public" {
-  count = (local.origin_access == "public") ? 1 : 0
+# Cloudfront for www S3
+resource "aws_cloudfront_distribution" "public_www" {
+  count = (var.need_www_redirect  &&  local.origin_access == "public") ? 1 : 0
 
   origin {
-    domain_name = aws_s3_bucket_website_configuration.web_portal_webConfig.website_endpoint
-    origin_id   = "S3-${local.bucket_name}"
+    domain_name = aws_s3_bucket_website_configuration.web_portal_redirect_config[0].website_endpoint
+    origin_id   = "S3-${local.www_bucket_name}"
     custom_origin_config {
       http_port              = 80
       https_port             = 443
@@ -33,11 +15,10 @@ resource "aws_cloudfront_distribution" "public" {
 
   enabled             = true
   is_ipv6_enabled     = true
-  comment             = "CloudFront for ${local.bucket_name}"
-  default_root_object = "index.html"
+  comment             = "CloudFront for ${local.www_bucket_name}"
+  # default_root_object = "index.html"
 
-  aliases = [var.domain_name]
-  # aliases = (var.need_www_redirect) ? [var.domain_name, "www.${var.domain_name}"] : [var.domain_name]
+  aliases = [local.www_bucket_name] 
 
   custom_error_response {
     error_caching_min_ttl = 10
@@ -56,7 +37,7 @@ resource "aws_cloudfront_distribution" "public" {
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "S3-${local.bucket_name}"
+    target_origin_id = "S3-${local.www_bucket_name}"
 
     forwarded_values {
       query_string = true
@@ -91,22 +72,21 @@ resource "aws_cloudfront_distribution" "public" {
   tags = var.tags
 }
 
-resource "aws_cloudfront_distribution" "oac" {
+resource "aws_cloudfront_distribution" "oac_www" {
   count = (local.origin_access == "oac") ? 1 : 0
 
   origin {
-    domain_name              = aws_s3_bucket.web_portal.bucket_regional_domain_name
-    origin_id                = "S3-${local.bucket_name}"
+    domain_name              = aws_s3_bucket.web_portal_redirect[0].bucket_regional_domain_name
+    origin_id                = "S3-${local.www_bucket_name}"
     origin_access_control_id = aws_cloudfront_origin_access_control.oac[0].id
   }
 
   enabled             = true
   is_ipv6_enabled     = true
-  comment             = "CloudFront for ${local.bucket_name}"
-  default_root_object = "index.html"
+  comment             = "CloudFront for ${local.www_bucket_name}"
+  # default_root_object = "index.html"
 
-  aliases = [var.domain_name]
-  # aliases = (var.need_www_redirect) ? [var.domain_name, "www.${var.domain_name}"] : [var.domain_name]
+  aliases = [local.www_bucket_name] 
 
   custom_error_response {
     error_caching_min_ttl = 10
@@ -125,7 +105,7 @@ resource "aws_cloudfront_distribution" "oac" {
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "S3-${local.bucket_name}"
+    target_origin_id = "S3-${local.www_bucket_name}"
 
     forwarded_values {
       query_string = true
@@ -157,12 +137,12 @@ resource "aws_cloudfront_distribution" "oac" {
 }
 
 
-resource "aws_cloudfront_distribution" "oai" {
+resource "aws_cloudfront_distribution" "oai_www" {
   count = (local.origin_access == "oai") ? 1 : 0
 
   origin {
-    domain_name = aws_s3_bucket.web_portal.bucket_regional_domain_name
-    origin_id   = "S3-${local.bucket_name}"
+    domain_name = aws_s3_bucket.web_portal_redirect[0].bucket_regional_domain_name
+    origin_id   = "S3-${local.www_bucket_name}"
     s3_origin_config {
       origin_access_identity = aws_cloudfront_origin_access_identity.oai[0].cloudfront_access_identity_path
     }
@@ -170,11 +150,10 @@ resource "aws_cloudfront_distribution" "oai" {
 
   enabled             = true
   is_ipv6_enabled     = true
-  comment             = "CloudFront for ${local.bucket_name}"
-  default_root_object = "index.html"
+  comment             = "CloudFront for ${local.www_bucket_name}"
+  # default_root_object = "index.html"
 
-  aliases = [var.domain_name]
-  # aliases = (var.need_www_redirect) ? [var.domain_name, "www.${var.domain_name}"] : [var.domain_name]
+  aliases = [local.www_bucket_name] 
 
   custom_error_response {
     error_caching_min_ttl = 10
@@ -193,7 +172,7 @@ resource "aws_cloudfront_distribution" "oai" {
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "S3-${local.bucket_name}"
+    target_origin_id = "S3-${local.www_bucket_name}"
 
     forwarded_values {
       query_string = true

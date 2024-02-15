@@ -10,6 +10,7 @@ terraform {
 
 locals {
   bucket_name = lower(var.domain_name)
+  www_bucket_name = "www.${local.bucket_name}"
   origin_access = lower(var.s3_access_method)
 }
 
