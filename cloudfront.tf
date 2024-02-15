@@ -95,7 +95,7 @@ resource "aws_cloudfront_distribution" "oac" {
   count = (local.origin_access == "oac") ? 1 : 0
 
   origin {
-    domain_name              = aws_s3_bucket.web_portal.bucket_domain_name
+    domain_name              = aws_s3_bucket.web_portal.bucket_regional_domain_name
     origin_id                = "S3-${local.bucket_name}"
     origin_access_control_id = aws_cloudfront_origin_access_control.oac[0].id
   }
@@ -161,7 +161,7 @@ resource "aws_cloudfront_distribution" "oai" {
   count = (local.origin_access == "oai") ? 1 : 0
 
   origin {
-    domain_name = aws_s3_bucket.web_portal.bucket_domain_name
+    domain_name = aws_s3_bucket.web_portal.bucket_regional_domain_name
     origin_id   = "S3-${local.bucket_name}"
     s3_origin_config {
       origin_access_identity = aws_cloudfront_origin_access_identity.oai[0].cloudfront_access_identity_path
