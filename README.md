@@ -59,7 +59,7 @@ This module will create below resources:
 1. Create a S3 bucket to host your website.
 2. Create a S3 bucket to redirect from www.sample.com to sample.com (if you assign variable **need_www_redirect = true**) .
 3. Create a SSL/TLS Certificate in AWS Certificate Manager (ACM) for the domain (sample.com) in US-East region.  Also add addition name www.sample.com if you like to redirect from www.sample.com to sample.com.  
-4. Create a CloudFront distribution which is a Content Distribution Network (CDN) to speeds up the distribution of your website content to your users worldwide. 
+4. Create a CloudFront distribution which is a Content Distribution Network (CDN) to speeds up the distribution of your website content to your users worldwide.  Also it will create one more CloudFront to redirect from www, if you assign variable **need_www_redirect = true**
 5. Create A record in Route 53 Hosted Zone to route traffic to your website.
 6. Host a placeholder website with a **Coming Soon** message, if you assign **need_placeholder_website = true**
 

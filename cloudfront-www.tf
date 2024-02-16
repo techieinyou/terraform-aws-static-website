@@ -16,7 +16,6 @@ resource "aws_cloudfront_distribution" "public_www" {
   enabled             = true
   is_ipv6_enabled     = true
   comment             = "CloudFront for ${local.www_bucket_name}"
-  # default_root_object = "index.html"
 
   aliases = [local.www_bucket_name] 
 
@@ -73,7 +72,7 @@ resource "aws_cloudfront_distribution" "public_www" {
 }
 
 resource "aws_cloudfront_distribution" "oac_www" {
-  count = (local.origin_access == "oac") ? 1 : 0
+  count = (var.need_www_redirect  &&  local.origin_access == "oac") ? 1 : 0
 
   origin {
     domain_name              = aws_s3_bucket.web_portal_redirect[0].bucket_regional_domain_name
@@ -84,7 +83,6 @@ resource "aws_cloudfront_distribution" "oac_www" {
   enabled             = true
   is_ipv6_enabled     = true
   comment             = "CloudFront for ${local.www_bucket_name}"
-  # default_root_object = "index.html"
 
   aliases = [local.www_bucket_name] 
 
@@ -138,7 +136,7 @@ resource "aws_cloudfront_distribution" "oac_www" {
 
 
 resource "aws_cloudfront_distribution" "oai_www" {
-  count = (local.origin_access == "oai") ? 1 : 0
+  count = (var.need_www_redirect  &&  local.origin_access == "oai") ? 1 : 0
 
   origin {
     domain_name = aws_s3_bucket.web_portal_redirect[0].bucket_regional_domain_name
@@ -151,7 +149,6 @@ resource "aws_cloudfront_distribution" "oai_www" {
   enabled             = true
   is_ipv6_enabled     = true
   comment             = "CloudFront for ${local.www_bucket_name}"
-  # default_root_object = "index.html"
 
   aliases = [local.www_bucket_name] 
 

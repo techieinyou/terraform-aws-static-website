@@ -7,13 +7,13 @@ data "aws_route53_zone" "by_id" {
 # retrieve Hosted Zone using Domain Name
 data "aws_route53_zone" "by_name" {
   count = (var.hosted_zone_id == null) ? 1 : 0
-  name  = var.domain_name
+  name  = local.domain_name
 }
 
 # creating A records in Route 53 to route traffic to the website
 resource "aws_route53_record" "root-a" {
   zone_id = (var.hosted_zone_id != null) ? data.aws_route53_zone.by_id[0].zone_id : data.aws_route53_zone.by_name[0].zone_id
-  name    = var.domain_name
+  name    = local.domain_name
   type    = "A"
 
   alias {
@@ -24,10 +24,10 @@ resource "aws_route53_record" "root-a" {
 }
 
 resource "aws_route53_record" "www-a" {
-  count  = (var.need_www_redirect) ? 1 : 0
+  count = (var.need_www_redirect) ? 1 : 0
 
   zone_id = (var.hosted_zone_id != null) ? data.aws_route53_zone.by_id[0].zone_id : data.aws_route53_zone.by_name[0].zone_id
-  name    = "www.${var.domain_name}"
+  name    = local.www_domain_name
   type    = "A"
 
   alias {

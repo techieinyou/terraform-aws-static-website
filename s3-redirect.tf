@@ -46,6 +46,6 @@ resource "aws_s3_bucket_website_configuration" "web_portal_redirect_config" {
 
   bucket = aws_s3_bucket.web_portal_redirect[0].id
   redirect_all_requests_to {
-    host_name = var.domain_name
+    host_name = local.domain_name
   }
 }

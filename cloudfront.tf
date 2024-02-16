@@ -2,8 +2,8 @@
 resource "aws_cloudfront_origin_access_control" "oac" {
   count = (local.origin_access == "oac") ? 1 : 0
 
-  name                              = var.domain_name
-  description                       = "Origin Access Control for ${var.domain_name}"
+  name                              = local.bucket_name
+  description                       = "Origin Access Control for ${local.bucket_name}"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
   signing_protocol                  = "sigv4"
@@ -36,8 +36,7 @@ resource "aws_cloudfront_distribution" "public" {
   comment             = "CloudFront for ${local.bucket_name}"
   default_root_object = "index.html"
 
-  aliases = [var.domain_name]
-  # aliases = (var.need_www_redirect) ? [var.domain_name, "www.${var.domain_name}"] : [var.domain_name]
+  aliases = [local.domain_name]
 
   custom_error_response {
     error_caching_min_ttl = 10
@@ -105,8 +104,8 @@ resource "aws_cloudfront_distribution" "oac" {
   comment             = "CloudFront for ${local.bucket_name}"
   default_root_object = "index.html"
 
-  aliases = [var.domain_name]
-  # aliases = (var.need_www_redirect) ? [var.domain_name, "www.${var.domain_name}"] : [var.domain_name]
+  aliases = [local.domain_name]
+  # aliases = (var.need_www_redirect) ? [local.domain_name, "www.${local.domain_name}"] : [local.domain_name]
 
   custom_error_response {
     error_caching_min_ttl = 10
@@ -173,8 +172,8 @@ resource "aws_cloudfront_distribution" "oai" {
   comment             = "CloudFront for ${local.bucket_name}"
   default_root_object = "index.html"
 
-  aliases = [var.domain_name]
-  # aliases = (var.need_www_redirect) ? [var.domain_name, "www.${var.domain_name}"] : [var.domain_name]
+  aliases = [local.domain_name]
+  # aliases = (var.need_www_redirect) ? [local.domain_name, "www.${local.domain_name}"] : [local.domain_name]
 
   custom_error_response {
     error_caching_min_ttl = 10
