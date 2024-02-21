@@ -88,8 +88,8 @@ CloudFront service principal will sign each request with SigV4. The signature wi
 
 If you select OAI, this module will create an Origin Access Identity to restrict access through CloudFront.  Eventhough AWS recommends OAC, OAI will continue to work and you can continue to use OAI for new distributions.
 
-## Cost Estimate
-Below is the Monthly cost estimate you will incur if you use this module. This is for your reference only, actual cost may vary.
+# Cost Estimate
+Below is the Monthly cost estimate you will incur when you use this module. 
 
 | **Resource**	| **Cost**  |
 |--------------|---------|
@@ -97,11 +97,8 @@ Below is the Monthly cost estimate you will incur if you use this module. This i
 |    -  Storage of less than 500MB data	                            | $0.15 |
 |    -  Content access/requests by user (free as we use CloudFront)	| $0.00 |
 | SSL/TLS certificates (free)	                                      | $0.00 |  
-| CloudFront Distribution	                                          | $0.00 |
-| Route 53 Hosted Zone	                                            | $2.50 |
+| CloudFront Distribution	                                          | $2.50 |
 | Route 53 Hosted Zone	                                            | $0.60 |
-|--------------|---------|
 | **Total Cost/Month**	|**$3.25**|
-|--------------|---------|
-
+__*This cost is calculated based on US-East-1 pricing and is for your reference only, actual cost may vary.__
 

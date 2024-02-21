@@ -105,7 +105,6 @@ resource "aws_cloudfront_distribution" "oac" {
   default_root_object = "index.html"
 
   aliases = [local.domain_name]
-  # aliases = (var.need_www_redirect) ? [local.domain_name, "www.${local.domain_name}"] : [local.domain_name]
 
   custom_error_response {
     error_caching_min_ttl = 10
@@ -173,7 +172,6 @@ resource "aws_cloudfront_distribution" "oai" {
   default_root_object = "index.html"
 
   aliases = [local.domain_name]
-  # aliases = (var.need_www_redirect) ? [local.domain_name, "www.${local.domain_name}"] : [local.domain_name]
 
   custom_error_response {
     error_caching_min_ttl = 10
